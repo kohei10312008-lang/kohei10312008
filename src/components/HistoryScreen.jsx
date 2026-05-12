@@ -79,7 +79,7 @@ export default function HistoryScreen({ onHome }) {
                 </div>
                 <ScoreBar score={h.score} />
                 <div className="history-detail">
-                  {h.correct}問正解 / {h.total}問中
+                  {h.subject && h.subject !== 'all' ? `【${h.subject}】` : '【全科目】'}{h.correct}問正解 / {h.total}問中
                 </div>
               </div>
             ))}

@@ -146,6 +146,24 @@ body {
 }
 .setting-select:focus { outline: none; border-color: var(--primary); }
 
+/* ── Subject Tabs ── */
+.subject-tabs { display: flex; gap: 8px; }
+.subject-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.subject-tab:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.subject-tab.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+
 .count-options { display: flex; gap: 8px; }
 .count-btn {
   flex: 1;

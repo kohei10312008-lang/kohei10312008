@@ -11,13 +11,16 @@ function shuffle(arr) {
   return a;
 }
 
-function buildSessionQuestions(category, count) {
-  const pool = category === 'all'
-    ? questions
-    : questions.filter(q => q.category === category);
+function buildSessionQuestions(subject, category, count) {
+  let pool = questions;
+  if (subject !== 'all') {
+    pool = pool.filter(q => q.subject === subject);
+  }
+  if (category !== 'all') {
+    pool = pool.filter(q => q.category === category);
+  }
   return shuffle(pool).slice(0, Math.min(count, pool.length)).map(q => {
     if (q.type === QUESTION_TYPES.MULTIPLE_CHOICE) {
-      // Shuffle choices and track new correct index
       const indexed = q.choices.map((text, i) => ({ text, isCorrect: i === q.correctIndex }));
       const shuffled = shuffle(indexed);
       return {
@@ -31,20 +34,22 @@ function buildSessionQuestions(category, count) {
 }
 
 export default function useQuiz() {
-  const [screen, setScreen] = useState('home'); // home | quiz | result | history
+  const [screen, setScreen] = useState('home');
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState([]); // { selectedIndex|selectedBool, correct, question }
+  const [answers, setAnswers] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [quizSubject, setQuizSubject] = useState('all');
 
-  const startQuiz = useCallback((category, count) => {
-    const qs = buildSessionQuestions(category, count);
+  const startQuiz = useCallback((subject, category, count) => {
+    const qs = buildSessionQuestions(subject, category, count);
     setQuizQuestions(qs);
     setCurrentIndex(0);
     setAnswers([]);
     setShowExplanation(false);
     setSelectedAnswer(null);
+    setQuizSubject(subject);
     setScreen('quiz');
   }, []);
 
@@ -63,16 +68,14 @@ export default function useQuiz() {
 
   const nextQuestion = useCallback(() => {
     if (currentIndex + 1 >= quizQuestions.length) {
-      // Save result
-      const score = answers.filter(a => a.correct).length + (answers.length < quizQuestions.length ? 0 : 0);
-      const finalAnswers = answers; // already has all answers at this point
-      const correctCount = finalAnswers.filter(a => a.correct).length;
+      const correctCount = answers.filter(a => a.correct).length;
       saveResult({
         date: new Date().toISOString(),
+        subject: quizSubject,
         total: quizQuestions.length,
         correct: correctCount,
         score: Math.round((correctCount / quizQuestions.length) * 100),
-        answers: finalAnswers,
+        answers,
       });
       setScreen('result');
     } else {
@@ -80,7 +83,7 @@ export default function useQuiz() {
       setShowExplanation(false);
       setSelectedAnswer(null);
     }
-  }, [currentIndex, quizQuestions.length, answers]);
+  }, [currentIndex, quizQuestions.length, answers, quizSubject]);
 
   const goHome = useCallback(() => setScreen('home'), []);
   const goHistory = useCallback(() => setScreen('history'), []);

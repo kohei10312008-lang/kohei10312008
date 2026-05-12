@@ -11,7 +11,7 @@ export default function App() {
   return (
     <div className="app-container">
       {quiz.screen === 'home' && (
-        <HomeScreen onStart={quiz.startQuiz} onHistory={quiz.goHistory} />
+        <HomeScreen onStart={(subject, category, count) => quiz.startQuiz(subject, category, count)} onHistory={quiz.goHistory} />
       )}
       {quiz.screen === 'quiz' && (
         <QuizScreen
